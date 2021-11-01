@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:foodla/Utils/colors.dart';
+import 'package:foodla/models/restaurant_model.dart';
+import 'package:provider/src/provider.dart';
 
 class Cart extends StatefulWidget {
   const Cart({Key? key}) : super(key: key);
@@ -25,9 +26,6 @@ class _CartState extends State<Cart> {
             SizedBox(height: width * 0.005),
             restaurantDetail(width),
             SizedBox(height: width * 0.025),
-            dishes(width),
-            dishes(width),
-            dishes(width),
             dishes(width),
             SizedBox(height: width * 0.025),
             coupons(width),
@@ -209,120 +207,140 @@ class _CartState extends State<Cart> {
         ),
       );
 
-  Widget dishes(double width) => Container(
-        padding: EdgeInsets.symmetric(
-          vertical: width * 0.04,
-          horizontal: width * 0.027,
-        ),
-        width: width,
-        color: Colors.white,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
+  Widget dishes(double width) {
+    Map items = context.watch<CartItems>().items;
+    List itemList = context.watch<CartItems>().itemList;
+    return Column(
+      children: [
+        for (var item in itemList)
+          Container(
+            padding: EdgeInsets.symmetric(
+              vertical: width * 0.04,
+              horizontal: width * 0.027,
+            ),
+            width: width,
+            color: Colors.white,
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Image(
-                  height: width * 0.058,
-                  width: width * 0.058,
-                  image:
-                      //  items[item]['veg']
-                      //     ? const AssetImage('assets/veg-img.png')
-                      //     :
-                      const AssetImage('assets/images/non-veg-icon.png'),
-                ),
-                SizedBox(width: width * 0.02),
-                Column(
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Chicken Chilli',
-                      style: TextStyle(
-                        fontSize: width * 0.04,
-                        fontWeight: FontWeight.w600,
+                    Image(
+                      height: width * 0.058,
+                      width: width * 0.058,
+                      image: items[item]['veg']
+                          ? const AssetImage('assets/images/veg-img.png')
+                          : const AssetImage('assets/images/non-veg-icon.png'),
+                    ),
+                    SizedBox(width: width * 0.02),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          items[item]['name'],
+                          style: TextStyle(
+                            fontSize: width * 0.04,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: width * 0.008),
+                        Text(
+                          '₹${items[item]['price']}',
+                          style: TextStyle(
+                            fontSize: width * 0.04,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: width * 0.008),
+                        Text(
+                          'CUSTOMIZED',
+                          style: TextStyle(
+                            fontSize: width * 0.032,
+                            color: Palate.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(width * 0.02),
+                      width: width * 0.27,
+                      height: width * 0.095,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                        ),
+                        border: Border.all(
+                          width: 1,
+                          color: Palate.primary,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              if (items.containsKey(item) &&
+                                  items[item]['quantity'] <= 1) {
+                                context.read<CartItems>().removeItem(item);
+                              } else {
+                                context
+                                    .read<CartItems>()
+                                    .decreaseQuantity(item);
+                              }
+                            },
+                            child: Icon(
+                              Icons.remove,
+                              size: width * 0.06,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            items[item]['quantity'].toString(),
+                            style: TextStyle(
+                              fontSize: width * 0.044,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.red,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              context.read<CartItems>().increaseQuantity(item);
+                            },
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: width * 0.06,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(height: width * 0.008),
+                    SizedBox(height: width * 0.012),
                     Text(
-                      '₹399',
+                      '₹${items[item]['totalPrice']}',
                       style: TextStyle(
-                        fontSize: width * 0.04,
+                        fontSize: width * 0.036,
                         fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(height: width * 0.008),
-                    Text(
-                      'CUSTOMIZED',
-                      style: TextStyle(
-                        fontSize: width * 0.032,
-                        color: Palate.primary,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
               ],
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(width * 0.02),
-                  width: width * 0.27,
-                  height: width * 0.095,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      bottomRight: Radius.circular(20),
-                    ),
-                    border: Border.all(
-                      width: 1,
-                      color: Palate.primary,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        child: Icon(
-                          Icons.remove,
-                          size: width * 0.06,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Text(
-                        2.toString(),
-                        style: TextStyle(
-                          fontSize: width * 0.044,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.red,
-                        ),
-                      ),
-                      GestureDetector(
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.black,
-                          size: width * 0.06,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: width * 0.012),
-                Text(
-                  '₹400',
-                  style: TextStyle(
-                    fontSize: width * 0.036,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
+          ),
+      ],
+    );
+  }
 
   Widget restaurantDetail(width) => Container(
         padding: EdgeInsets.all(width * 0.027),
