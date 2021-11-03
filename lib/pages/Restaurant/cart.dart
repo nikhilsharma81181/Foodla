@@ -362,7 +362,6 @@ class _CartState extends State<Cart> {
     String? location = context.watch<RestaurantModel>().location;
     return Container(
       padding: EdgeInsets.all(width * 0.027),
-      width: width,
       color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
