@@ -12,6 +12,9 @@ class RestaurantModel extends ChangeNotifier {
   int selectedType = 0;
   int selectedSpicy = 0;
   int quantity = 1;
+  String? name;
+  String? dishType;
+  String? location;
 
   resetSelectedData() {
     selectedPrice = 0;
@@ -54,6 +57,12 @@ class RestaurantModel extends ChangeNotifier {
     restaurantId = id;
     tableNo = table;
     notifyListeners();
+  }
+
+  getRestaurantDetails(restName, dishtype,restLocation) {
+    name = restName;
+    dishType = dishtype;
+    location = restLocation;
   }
 
   getMenuState(bool show) {

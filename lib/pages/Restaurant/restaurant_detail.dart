@@ -154,19 +154,22 @@ class _RestaurantDetailsState extends State<RestaurantDetails> {
             SizedBox(height: height * 0.017),
             browseMenu(),
             SizedBox(height: height * 0.017),
-            if (items.isNotEmpty) floatingCartBar(),
+            if (items.isNotEmpty) floatingCartBar(e),
           ],
         ),
       ),
     );
   }
 
-  Widget floatingCartBar() {
+  Widget floatingCartBar(Map<String, dynamic> e) {
     double width = MediaQuery.of(context).size.width;
     int quantity = context.watch<CartItems>().quantity;
     int totalPrice = context.watch<CartItems>().totalPrice;
     return GestureDetector(
       onTap: () {
+        context
+            .read<RestaurantModel>()
+            .getRestaurantDetails(e['name'], e['dish-type'],'not in backend');
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => const Cart()));
         // print(items);

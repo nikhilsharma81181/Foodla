@@ -18,27 +18,34 @@ class _CartState extends State<Cart> {
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: appbar(width),
-      body: Container(
-        width: width,
-        color: Colors.grey.shade200,
-        child: ListView(
-          children: [
-            SizedBox(height: width * 0.005),
-            restaurantDetail(width),
-            SizedBox(height: width * 0.025),
-            dishes(width),
-            SizedBox(height: width * 0.025),
-            coupons(width),
-            SizedBox(height: width * 0.025),
-            billDetails(),
-          ],
-        ),
+      body: Stack(
+        children: [
+          Container(
+            width: width,
+            color: Colors.grey.shade200,
+            child: ListView(
+              children: [
+                SizedBox(height: width * 0.005),
+                restaurantDetail(width),
+                SizedBox(height: width * 0.025),
+                dishes(width),
+                SizedBox(height: width * 0.025),
+                coupons(width),
+                SizedBox(height: width * 0.025),
+                billDetails(),
+              ],
+            ),
+          ),
+          orderPlaceButton(),
+        ],
       ),
     );
   }
 
   Widget billDetails() {
     double width = MediaQuery.of(context).size.width;
+    double totalPrice = context.watch<CartItems>().totalPrice.toDouble();
+    double taxes = totalPrice * 5 / 100;
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: width * 0.04,
@@ -57,12 +64,11 @@ class _CartState extends State<Cart> {
             ),
           ),
           SizedBox(height: width * 0.025),
-          eachBill('Item total', '₹499'),
-          eachBill('Taxes and Charges', '₹30'),
+          eachBill('Item total', '₹$totalPrice'),
+          eachBill('Taxes and Charges', '₹$taxes'),
           Divider(color: Colors.grey.shade300, thickness: 2),
-          totalBill('Total Price', '₹429'),
-          SizedBox(height: width * 0.05),
-          orderPlaceButton(),
+          totalBill('Total Price', '₹${totalPrice + taxes}'),
+          SizedBox(height: width * 0.3),
         ],
       ),
     );
@@ -70,39 +76,47 @@ class _CartState extends State<Cart> {
 
   Widget orderPlaceButton() {
     double width = MediaQuery.of(context).size.width;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: width * 0.472,
-            height: width * 0.15,
-            color: Colors.grey.shade200,
-            alignment: Alignment.center,
-            child: Text(
-              '₹429',
-              style: TextStyle(
-                fontSize: width * 0.05,
-                fontWeight: FontWeight.w600,
+    double totalPrice = context.watch<CartItems>().totalPrice.toDouble();
+    double taxes = totalPrice * 5 / 100;
+    return Positioned(
+      bottom: width * 0.02,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: width * 0.02),
+        color: Colors.white,
+        width: width,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: width * 0.485,
+              height: width * 0.15,
+              alignment: Alignment.center,
+              child: Text(
+                '₹${totalPrice + taxes}',
+                style: TextStyle(
+                  fontSize: width * 0.05,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-          Container(
-            width: width * 0.472,
-            height: width * 0.15,
-            color: Palate.secondary,
-            alignment: Alignment.center,
-            child: Text(
-              'Place order',
-              style: TextStyle(
-                fontSize: width * 0.05,
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
+            Container(
+              width: width * 0.485,
+              height: width * 0.15,
+              decoration: BoxDecoration(
+                  color: Palate.secondary,
+                  borderRadius: BorderRadius.circular(15)),
+              alignment: Alignment.center,
+              child: Text(
+                'Place order',
+                style: TextStyle(
+                  fontSize: width * 0.05,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -342,38 +356,43 @@ class _CartState extends State<Cart> {
     );
   }
 
-  Widget restaurantDetail(width) => Container(
-        padding: EdgeInsets.all(width * 0.027),
-        width: width,
-        color: Colors.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Chef Food',
-              style: TextStyle(
-                fontSize: width * 0.072,
-                fontWeight: FontWeight.w500,
-              ),
+  Widget restaurantDetail(width) {
+    String? name = context.watch<RestaurantModel>().name;
+    String? dishType = context.watch<RestaurantModel>().dishType;
+    String? location = context.watch<RestaurantModel>().location;
+    return Container(
+      padding: EdgeInsets.all(width * 0.027),
+      width: width,
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            name!,
+            style: TextStyle(
+              fontSize: width * 0.072,
+              fontWeight: FontWeight.w500,
             ),
-            Text(
-              'North Indian, Mughlai, Chinese',
-              style: TextStyle(
-                  fontSize: width * 0.037,
-                  fontWeight: FontWeight.w400,
-                  height: width * 0.004),
-            ),
-            Text(
-              '34 steet, vas vegas, 4328',
-              style: TextStyle(
-                  fontSize: width * 0.037,
-                  color: Colors.grey.shade700,
-                  fontWeight: FontWeight.w400,
-                  height: width * 0.0034),
-            ),
-          ],
-        ),
-      );
+          ),
+          Text(
+            dishType!,
+            style: TextStyle(
+                fontSize: width * 0.037,
+                fontWeight: FontWeight.w400,
+                height: width * 0.004),
+          ),
+          Text(
+            location?? 'update in backend',
+            style: TextStyle(
+                fontSize: width * 0.037,
+                color: Colors.grey.shade700,
+                fontWeight: FontWeight.w400,
+                height: width * 0.0034),
+          ),
+        ],
+      ),
+    );
+  }
 
   AppBar appbar(double width) {
     return AppBar(
