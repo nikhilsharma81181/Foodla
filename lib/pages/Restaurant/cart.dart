@@ -376,6 +376,9 @@ class _CartState extends State<Cart> {
           Text(
             dishType!,
             style: TextStyle(
+
+
+              
                 fontSize: width * 0.037,
                 fontWeight: FontWeight.w400,
                 height: width * 0.004),
