@@ -1,8 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:foodla/Utils/colors.dart';
+import 'package:foodla/Utils/utils.dart';
 import 'package:foodla/models/restaurant_model.dart';
+import 'package:foodla/pages/Restaurant/final_screen.dart';
 import 'package:provider/src/provider.dart';
+
+var user = FirebaseAuth.instance.currentUser;
 
 class Cart extends StatefulWidget {
   const Cart({Key? key}) : super(key: key);
@@ -12,10 +17,62 @@ class Cart extends StatefulWidget {
 }
 
 class _CartState extends State<Cart> {
+  String? _userName;
+  String? _userPhone;
+  @override
+  void initState() {
+    super.initState();
+    getUserData();
+  }
+
+  Future getUserData() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .get()
+        .then((value) {
+      setState(() {
+        _userName = value['name'];
+        _userPhone = value['phonenumber'];
+      });
+    });
+  }
+
+  Future placeOrder(
+      Map items, int quantity, List itemList, double totalPrice) async {
+    double taxes = totalPrice * 5 / 100;
+    try {
+      DocumentReference _docRef = await Ref.ordersRef.add({
+        'useruid': user!.uid,
+        'name': _userName,
+        'phoneNumber': _userPhone,
+        'totalPrice': totalPrice,
+        'totalPriceTaxes': totalPrice + taxes,
+        'stage': 0,
+      });
+
+      for (var item in itemList)
+        await Ref.ordersRef.doc(_docRef.id).collection('dishes').add({
+          'veg': items[item]['veg'],
+          'dish-name': items[item]['name'],
+          'price': items[item]['price'],
+          'quantity': quantity,
+          'unit': items[item]['unit'],
+          'unitQuantity': items[item]['unitQuantity'],
+          'type': items[item]['type'],
+          'spicy': items[item]['spicy'],
+        });
+      context.read<CartItems>().getOrderId(_docRef.id);
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => FinalScreen()));
+
+      return 'done!';
+    } catch (e) {}
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: appbar(width),
       body: Stack(
@@ -78,6 +135,9 @@ class _CartState extends State<Cart> {
     double width = MediaQuery.of(context).size.width;
     double totalPrice = context.watch<CartItems>().totalPrice.toDouble();
     double taxes = totalPrice * 5 / 100;
+    Map items = context.watch<CartItems>().items;
+    int quantity = context.watch<RestaurantModel>().quantity;
+    List itemList = context.watch<CartItems>().itemList;
     return Positioned(
       bottom: width * 0.02,
       child: Container(
@@ -99,19 +159,27 @@ class _CartState extends State<Cart> {
                 ),
               ),
             ),
-            Container(
-              width: width * 0.485,
-              height: width * 0.15,
-              decoration: BoxDecoration(
-                  color: Palate.secondary,
-                  borderRadius: BorderRadius.circular(15)),
-              alignment: Alignment.center,
-              child: Text(
-                'Place order',
-                style: TextStyle(
-                  fontSize: width * 0.05,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
+            GestureDetector(
+              onTap: () {
+                var status = placeOrder(items, quantity, itemList, totalPrice);
+
+                // Navigator.of(context).push(
+                //     MaterialPageRoute(builder: (context) => FinalScreen()));
+              },
+              child: Container(
+                width: width * 0.485,
+                height: width * 0.15,
+                decoration: BoxDecoration(
+                    color: Palate.secondary,
+                    borderRadius: BorderRadius.circular(15)),
+                alignment: Alignment.center,
+                child: Text(
+                  'Place order',
+                  style: TextStyle(
+                    fontSize: width * 0.05,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -260,14 +328,30 @@ class _CartState extends State<Cart> {
                           ),
                         ),
                         SizedBox(height: width * 0.008),
-                        Text(
-                          '₹${items[item]['price']}',
-                          style: TextStyle(
-                            fontSize: width * 0.04,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '₹${items[item]['price']} ',
+                              style: TextStyle(
+                                fontSize: width * 0.04,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(
+                              width: width * 0.47,
+                              child: Text(
+                                '(${items[item]['unitQuantity']} ${items[item]['unit']}, ${items[item]['type']}, ${items[item]['spicy']})',
+                                style: TextStyle(
+                                  fontSize: width * 0.038,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: width * 0.008),
+                        SizedBox(height: width * 0.01),
                         Text(
                           'CUSTOMIZED',
                           style: TextStyle(
@@ -376,15 +460,13 @@ class _CartState extends State<Cart> {
           Text(
             dishType!,
             style: TextStyle(
-
-
-              
-                fontSize: width * 0.037,
-                fontWeight: FontWeight.w400,
-                height: width * 0.004),
+              fontSize: width * 0.037,
+              fontWeight: FontWeight.w400,
+              height: width * 0.004,
+            ),
           ),
           Text(
-            location?? 'update in backend',
+            location ?? 'update in backend',
             style: TextStyle(
                 fontSize: width * 0.037,
                 color: Colors.grey.shade700,

@@ -17,14 +17,12 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    String? id = context.watch<RestaurantModel>().restaurantId;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: width * 0.02),
       child: SafeArea(
         child: ListView(
           children: [
             header(),
-            Text(id ?? 'asdf'),
             SizedBox(height: height * 0.012),
             const Carosuel(),
             SizedBox(height: height * 0.02),

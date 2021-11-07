@@ -27,9 +27,35 @@ class MyApp extends StatelessWidget {
         title: 'FoodLa',
         debugShowCheckedModeBanner: false,
         home: FirebaseAuth.instance.currentUser == null
-            ? const StartPage()
-            : const Homepage(),
+            ? StartPage()
+            : Homepage(),
       ),
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasData) {
+          return const Homepage();
+        } else if (snapshot.hasError) {
+          return const Center(
+            child: Text('Something went wrong!'),
+          );
+        } else {
+          return const StartPage();
+        }
+      },
     );
   }
 }

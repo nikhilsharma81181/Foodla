@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:foodla/Utils/colors.dart';
+import 'package:foodla/Utils/utils.dart';
 import 'package:foodla/pages/LoginPage/otp_page.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class User extends StatefulWidget {
   const User({Key? key}) : super(key: key);
@@ -84,8 +85,8 @@ class _UserState extends State<User> {
               ),
               SizedBox(height: width * 0.015),
               optonCard('Your Orders', () {}),
-              optonCard('Favorite Orders',() {}),
-              optonCard('Help',() {}),
+              optonCard('Favorite Orders', () {}),
+              optonCard('Help', () {}),
               optonCard('Logout', () {
                 auth.signOut();
                 // Navigator.of(context).pushReplacement(

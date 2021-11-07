@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodla/Utils/colors.dart';
+import 'package:foodla/Utils/utils.dart';
 import 'package:foodla/pages/LoginPage/login_page.dart';
 
 class StartPage extends StatelessWidget {

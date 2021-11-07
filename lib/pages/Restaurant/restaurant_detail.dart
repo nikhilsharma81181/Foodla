@@ -1,12 +1,8 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:foodla/Tools/encryption.dart';
-import 'package:foodla/Utils/colors.dart';
+import 'package:foodla/Utils/utils.dart';
 import 'package:foodla/models/restaurant_model.dart';
 import 'package:foodla/pages/Restaurant/bottom_sheet.dart';
 import 'package:foodla/pages/Restaurant/cart.dart';
@@ -28,54 +24,6 @@ class _RestaurantDetailsState extends State<RestaurantDetails> {
   bool value1 = true;
   List price = [499, 599, 125, 249, 329, 110];
   bool added = false;
-  Timer timer = Timer.periodic(const Duration(milliseconds: 0), (_) {});
-  AESEncryption encryption = AESEncryption();
-  String? scanResult;
-
-  // @override
-  // void initState() {
-  //   getQrData();
-  //   super.initState();
-  // }
-
-  // @override
-  // void dispose() {
-  //   timer.cancel();
-  //   super.dispose();
-  // }
-
-  // getQrData() {
-  //   scanCode();
-
-  //   timer = Timer.periodic(const Duration(milliseconds: 100), (_) {
-  //     if (scanResult != null) {
-  //       var splitedData = scanResult!.split(' ');
-  //       var decodedData =
-  //           encryption.decryptData(encryption.getCode(splitedData[0]));
-  //       context
-  //           .read<RestaurantModel>()
-  //           .getRestaurantId(decodedData, splitedData[1]);
-  //       timer.cancel();
-  //     }
-  //   });
-  // }
-
-  Future scanCode() async {
-    String scanResult;
-    try {
-      scanResult = await FlutterBarcodeScanner.scanBarcode(
-        '#495261',
-        'Cancel',
-        true,
-        ScanMode.QR,
-      );
-    } on PlatformException {
-      scanResult = 'failed';
-    }
-    if (!mounted) return;
-
-    setState(() => this.scanResult = scanResult);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,7 +117,7 @@ class _RestaurantDetailsState extends State<RestaurantDetails> {
       onTap: () {
         context
             .read<RestaurantModel>()
-            .getRestaurantDetails(e['name'], e['dish-type'],'not in backend');
+            .getRestaurantDetails(e['name'], e['dish-type'], 'not in backend');
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => const Cart()));
         // print(items);
@@ -704,34 +652,40 @@ class _RestaurantDetailsState extends State<RestaurantDetails> {
 
   Widget browseMenu() {
     double width = MediaQuery.of(context).size.width;
+    Map items = context.watch<CartItems>().items;
     return Column(
       children: [
-        Container(
-          width: width * 0.48,
-          height: width * 0.12,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            color: Colors.black,
-          ),
-          alignment: Alignment.center,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.list,
-                color: Colors.white,
-                size: width * 0.062,
-              ),
-              SizedBox(width: width * 0.015),
-              Text(
-                'Browse menu',
-                style: TextStyle(
-                  fontSize: width * 0.045,
-                  fontWeight: FontWeight.w500,
+        GestureDetector(
+          onTap: () {
+            print(items);
+          },
+          child: Container(
+            width: width * 0.48,
+            height: width * 0.12,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              color: Colors.black,
+            ),
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.list,
                   color: Colors.white,
+                  size: width * 0.062,
                 ),
-              ),
-            ],
+                SizedBox(width: width * 0.015),
+                Text(
+                  'Browse menu',
+                  style: TextStyle(
+                    fontSize: width * 0.045,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],

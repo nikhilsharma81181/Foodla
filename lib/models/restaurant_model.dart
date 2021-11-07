@@ -59,7 +59,7 @@ class RestaurantModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  getRestaurantDetails(restName, dishtype,restLocation) {
+  getRestaurantDetails(restName, dishtype, restLocation) {
     name = restName;
     dishType = dishtype;
     location = restLocation;
@@ -93,6 +93,7 @@ class CartItems extends ChangeNotifier {
   int quantity = 0;
   int totalPrice = 0;
   Timer timer = Timer.periodic(const Duration(seconds: 1), (timer) {});
+  String? orderId;
 
   perItemTotal(String name) {
     items[name]['totalPrice'] = items[name]['quantity'] * items[name]['price'];
@@ -111,7 +112,8 @@ class CartItems extends ChangeNotifier {
     notifyListeners();
   }
 
-  addItem(String name, int price, quantity, bool veg) {
+  addItem(String name, int price, int quantity, bool veg, String unit,
+      String unitquantity, String type, String spicy) {
     if (!itemList.contains(name)) {
       itemList.add(name);
     }
@@ -132,6 +134,10 @@ class CartItems extends ChangeNotifier {
           'quantity': quantity,
           'veg': veg,
           'totalPrice': price,
+          'unit': unit,
+          'unitQuantity': unitquantity,
+          'type': type,
+          'spicy': spicy,
         },
         ifAbsent: () => {},
       );
@@ -165,8 +171,9 @@ class CartItems extends ChangeNotifier {
     getExtra();
     notifyListeners();
   }
-}
 
-class Order {
-  placeOrder() {}
+  getOrderId(String id) {
+    orderId = id;
+    notifyListeners();
+  }
 }

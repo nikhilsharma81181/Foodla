@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:foodla/Utils/colors.dart';
+import 'package:foodla/Utils/utils.dart';
 import 'package:foodla/pages/Homepage/homepage.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 

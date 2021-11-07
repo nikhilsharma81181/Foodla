@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:foodla/Utils/colors.dart';
+import 'package:foodla/Utils/utils.dart';
 import 'package:foodla/models/restaurant_model.dart';
 import 'package:provider/src/provider.dart';
 
@@ -60,17 +60,17 @@ class _BottomSliderState extends State<BottomSlider> {
                       ),
                     ],
                   ),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image(
-                      height: width * 0.27,
-                      width: width * 0.4,
-                      image: NetworkImage(
-                        e['photoUrl'],
-                      ),
-                      fit: BoxFit.cover,
-                    ),
-                  )
+                  // ClipRRect(
+                  //   borderRadius: BorderRadius.circular(15),
+                  //   child: Image(
+                  //     height: width * 0.27,
+                  //     width: width * 0.4,
+                  //     image: NetworkImage(
+                  //       e['photoUrl'],
+                  //     ),
+                  //     fit: BoxFit.cover,
+                  //   ),
+                  // )
                 ],
               ),
               SizedBox(height: width * 0.04),
@@ -142,8 +142,18 @@ class _BottomSliderState extends State<BottomSlider> {
                     borderRadius: BorderRadius.circular(15)),
                 child: RawMaterialButton(
                   onPressed: () {
-                    context.read<CartItems>().addItem(e['name'],
-                        e['price'][selectedPrice], quantity, e['veg']);
+                    context.read<CartItems>().addItem(
+                          e['name'],
+                          e['price'][selectedPrice],
+                          quantity,
+                          e['veg'],
+                          e['unit'],
+                          e['unit'] != 'pieces'
+                              ? e[e['unit']][selectedQuantityUnit]
+                              : 'null',
+                          e['type'][selectedType],
+                          e['spicy'][selectedSpicy],
+                        );
                     if (items.containsKey(e['name'])) {
                       Navigator.of(context).pop();
                     }
@@ -159,7 +169,7 @@ class _BottomSliderState extends State<BottomSlider> {
                 ),
               )
             ],
-          )
+          ),
         ],
       ),
     );

@@ -1,12 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:foodla/Tools/encryption.dart';
-import 'package:foodla/Utils/colors.dart';
-import 'package:foodla/models/restaurant_model.dart';
+import 'package:foodla/Utils/utils.dart';
 import 'package:foodla/pages/Gift/gift.dart';
 import 'package:foodla/pages/Homepage/home.dart';
 import 'package:foodla/pages/Qr_code/scanner.dart';
@@ -59,7 +53,7 @@ class _HomepageState extends State<Homepage> {
                     children: [
                       buildIcon(0, width * 0.068, width * 0.068, 'Home'),
                       buildIcon(1, width * 0.065, width * 0.065, 'Search'),
-                      SizedBox(width: width * 0.17),
+                      qrButton(),
                       buildIcon(2, width * 0.068, width * 0.068, 'Gift'),
                       buildIcon(3, width * 0.068, width * 0.068, 'User'),
                     ],
@@ -68,40 +62,33 @@ class _HomepageState extends State<Homepage> {
               ),
             ),
           ),
-          Positioned(
-            bottom: width * 0.027,
-            width: width,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SafeArea(
-                  child: SizedBox(
-                    width: width * 0.22,
-                    height: width * 0.22,
-                    child: RawMaterialButton(
-                      elevation: 14,
-                      fillColor: Palate.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      onPressed: () {
-                        // Navigator.of(context).push(MaterialPageRoute(
-                        //     builder: (context) => const Scanner()));
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const RestaurantDetails()));
-                      },
-                      child: Icon(
-                        Icons.qr_code,
-                        color: Colors.white,
-                        size: width * 0.11,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
+      ),
+    );
+  }
+
+  Widget qrButton() {
+    double width = MediaQuery.of(context).size.width;
+    return SizedBox(
+      width: width * 0.147,
+      height: width * 0.147,
+      child: RawMaterialButton(
+        elevation: 14,
+        fillColor: Palate.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(100),
+        ),
+        onPressed: () {
+          // Navigator.of(context)
+          //     .push(MaterialPageRoute(builder: (context) => const Scanner()));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const RestaurantDetails()));
+        },
+        child: Icon(
+          Icons.qr_code,
+          color: Colors.white,
+          size: width * 0.085,
+        ),
       ),
     );
   }
